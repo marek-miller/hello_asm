@@ -1,3 +1,3 @@
 # hello_asm
 
-x64 NAMS template.
+x64 NASM template.
