@@ -4,12 +4,12 @@ ASM		= nasm
 ASMFLAGS	= -Ox -f elf64 -w+all -w-reloc-rel-dword
 CC		= gcc
 CFLAGS		= -O2 -Wall -Wextra
-DEPS		= hello.h
 INCLUDE		= .
 LD		= ld
 LDFLAGS		=
 LDLIBS		= -lm
 
+DEPS		= hello.h
 OBJS		= main.o hello.o
 
 .PHONY: all clean debug
