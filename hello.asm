@@ -1,10 +1,13 @@
+[bits 64]
 default rel
 
 global hello_asm
 
+
 section .data
 
 hello_msg	db	"Hello from asm!", 0x0a, 0
+
 
 section .text
 	extern	printf

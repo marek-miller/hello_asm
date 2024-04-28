@@ -1,19 +1,26 @@
 PROGRAM		= hello_asm
 
-ASM			= nasm
-ASMFLAGS	= -f elf64 -w+all -g -Fdwarf
-CC			= gcc
-CFLAGS		= -Wall -Wextra -g
+ASM		= nasm
+ASMFLAGS	= -Ox -f elf64 -w+all -w-reloc-rel-dword
+CC		= gcc
+CFLAGS		= -O2 -Wall -Wextra
 DEPS		= hello.h
 INCLUDE		= .
-LD			= ld
+LD		= ld
 LDFLAGS		=
+LDLIBS		= -lm
 
-.PHONY: all clean
+OBJS		= main.o hello.o
+
+.PHONY: all clean debug
 all: $(PROGRAM)
 
-$(PROGRAM): $(DEPS) main.o hello.o
-	$(CC) $(LDFLAGS) -o $(PROGRAM) $^
+debug: CFLAGS	+= -g -Og -DDEBUG
+debug: ASMFLAGS	+= -g -Fdwarf -DDEBUG
+debug: all
+
+$(PROGRAM): $(DEPS) $(OBJS)
+	$(CC) $(LDFLAGS) -o $(PROGRAM) $^ $(LDLIBS)
 
 %.o: %.c $(DEPS)
 	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCLUDE)
