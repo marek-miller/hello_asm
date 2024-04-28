@@ -3,7 +3,7 @@ PROGRAM		= hello_asm
 ASM		= nasm
 ASMFLAGS	= -Ox -f elf64 -w+all -w-reloc-rel-dword
 CC		= gcc
-CFLAGS		= -O2 -Wall -Wextra
+CFLAGS		= -O2 -march=native -Wall -Wextra
 INCLUDE		= .
 LD		= ld
 LDFLAGS		=
