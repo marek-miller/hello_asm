@@ -1,5 +1,5 @@
-*.o
-hello_asm*
+build/
+tmp/
 
 .idea/
-tmp/
+

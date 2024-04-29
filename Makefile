@@ -1,4 +1,4 @@
-PROGRAM		= hello_asm
+PROGRAM		= helloasm
 ROOT_DIR	= .
 
 AS		= nasm
@@ -7,7 +7,7 @@ CC		= gcc
 CFLAGS		= -O2 -march=native -Wall -Wextra
 INCLUDE		= $(ROOT_DIR)/include
 LD		= ld
-LDFLAGS		= -L$(BUILD)
+LDFLAGS		= -L$(LIB)
 LDLIBS		= -lm
 
 RM		= rm -fv
@@ -16,31 +16,38 @@ RMDIR		= rm -rfv
 
 SRC		= $(ROOT_DIR)/src
 BUILD		= $(ROOT_DIR)/build
-OBJ		= $(BUILD)/obj
 BIN		= $(BUILD)/bin
 LIB		= $(BUILD)/lib
+OBJ		= $(BUILD)/obj
+ 
+OBJS		= $(addprefix $(OBJ)/,	\
+			 main.o 	)
 
-OBJS		= main.o hello_a.o hello_c.o
-OBJS		:= $(addprefix $(OBJ)/,$(OBJS))
+LIBNAME		= lib$(PROGRAM).so
+LIBOBJS		= $(addprefix $(OBJ)/,	\
+			 hello_a.o	\
+			 hello_c.o	)
 
-
-.PHONY: all clean debug test
+.PHONY: all clean debug
 all: $(BIN)/$(PROGRAM)
 
 debug: CFLAGS	+= -g -Og -DDEBUG
 debug: ASMFLAGS	+= -g -Fdwarf -DDEBUG
 debug: all
 
-$(BIN)/$(PROGRAM): $(OBJS) | $(BIN)
-	$(CC) -o $@ $^ $(LDLIBS) $(LDFLAGS)
+$(BIN)/$(PROGRAM): $(OBJS) $(LIB)/$(LIBNAME) | $(BIN) 
+	$(CC) -o $@ $(OBJS) -l$(PROGRAM) $(LDLIBS) $(LDFLAGS) 
 
-$(OBJ)/%.o: $(SRC)/%.c $(DEPS) | $(OBJ)
+$(LIB)/$(LIBNAME): $(LIBOBJS) | $(LIB)
+	$(LD) -shared -o $@ $(LIBOBJS) $(LDLIBS) $(LDFLAGS)
+
+$(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 	$(CC) -o $@ -c $< -I$(INCLUDE) $(CFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.s | $(OBJ)
 	$(AS) -o $@ $< -I$(INCLUDE) $(ASFLAGS)
 
-$(OBJS): $(OBJ)
+$(OBJS) $(LIBOBJS): $(OBJ)
 
 $(BIN) $(LIB) $(OBJ):
 	$(MKDIR) $@
