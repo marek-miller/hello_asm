@@ -19,33 +19,37 @@ BUILD		= $(ROOT_DIR)/build
 BIN		= $(BUILD)/bin
 LIB		= $(BUILD)/lib
 OBJ		= $(BUILD)/obj
- 
-OBJS		= $(addprefix $(OBJ)/,	\
-			 main.o 	)
+
+HEADERS		= hello.h
+
+SRCS		= main.c
+OBJS		= $(SRCS:%=$(OBJ)/%.o)
 
 LIBNAME		= lib$(PROGRAM).so
-LIBOBJS		= $(addprefix $(OBJ)/,	\
-			 hello_a.o	\
-			 hello_c.o	)
+LIBSRCS		= hello.s hello.c
+LIBOBJS		= $(LIBSRCS:%=$(OBJ)/%.o)
+
 
 .PHONY: all clean debug
-all: $(BIN)/$(PROGRAM)
+.DEFAULT: all
+
+all: $(BIN)/$(PROGRAM) $(LIB)/$(LIBNAME)
 
 debug: CFLAGS	+= -g -Og -DDEBUG
 debug: ASMFLAGS	+= -g -Fdwarf -DDEBUG
 debug: all
 
 $(BIN)/$(PROGRAM): $(OBJS) $(LIB)/$(LIBNAME) | $(BIN) 
-	$(CC) -o $@ $(OBJS) -l$(PROGRAM) $(LDLIBS) $(LDFLAGS) 
+	$(CC) -o $@ $(OBJS) -l$(PROGRAM) $(LDLIBS) $(LDFLAGS)
 
 $(LIB)/$(LIBNAME): $(LIBOBJS) | $(LIB)
 	$(LD) -shared -o $@ $(LIBOBJS) $(LDLIBS) $(LDFLAGS)
 
-$(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
-	$(CC) -o $@ -c $< -I$(INCLUDE) $(CFLAGS)
+$(OBJ)/%.c.o: $(SRC)/%.c | $(INCLUDE)/$(HEADERS) $(OBJ)
+	$(CC) -o $@ -c $< -I$(INCLUDE) -I$(SRC) $(CFLAGS)
 
-$(OBJ)/%.o: $(SRC)/%.s | $(OBJ)
-	$(AS) -o $@ $< -I$(INCLUDE) $(ASFLAGS)
+$(OBJ)/%.s.o: $(SRC)/%.s | $(OBJ)
+	$(AS) -o $@ $< -I$(INCLUDE) -I$(SRC) $(ASFLAGS)
 
 $(OBJS) $(LIBOBJS): $(OBJ)
 
