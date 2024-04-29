@@ -2,7 +2,7 @@ PROGRAM		= helloasm
 ROOT_DIR	= .
 
 AS		= nasm
-ASFLAGS		= -Ox -f elf64 -w+all -w-reloc-rel-dword
+ASFLAGS		= -Ox -felf64 -w+all -w-reloc-rel-dword
 CC		= gcc
 CFLAGS		= -O2 -march=native -Wall -Wextra
 INCLUDE		= $(ROOT_DIR)/include
@@ -31,13 +31,13 @@ LIBOBJS		= $(LIBSRCS:%=$(OBJ)/%.o)
 
 
 .PHONY: all clean debug
-.DEFAULT: all
+.DEFAULT_GOAL	:= all
+
+debug: CFLAGS	+= -DDEBUG -g -Og 
+debug: ASFLAGS	+= -DDEBUG -g -Fdwarf 
+debug: all
 
 all: $(BIN)/$(PROGRAM) $(LIB)/$(LIBNAME)
-
-debug: CFLAGS	+= -g -Og -DDEBUG
-debug: ASMFLAGS	+= -g -Fdwarf -DDEBUG
-debug: all
 
 $(BIN)/$(PROGRAM): $(OBJS) $(LIB)/$(LIBNAME) | $(BIN) 
 	$(CC) -o $@ $(OBJS) -l$(PROGRAM) $(LDLIBS) $(LDFLAGS)
