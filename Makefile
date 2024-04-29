@@ -20,7 +20,7 @@ OBJ		= $(BUILD)/obj
 BIN		= $(BUILD)/bin
 LIB		= $(BUILD)/lib
 
-OBJS		= main.o hello.o
+OBJS		= main.o hello_a.o hello_c.o
 OBJS		:= $(addprefix $(OBJ)/,$(OBJS))
 
 
@@ -37,7 +37,7 @@ $(BIN)/$(PROGRAM): $(OBJS) | $(BIN)
 $(OBJ)/%.o: $(SRC)/%.c $(DEPS) | $(OBJ)
 	$(CC) -o $@ -c $< -I$(INCLUDE) $(CFLAGS)
 
-$(OBJ)/%.o: $(SRC)/%.asm | $(OBJ)
+$(OBJ)/%.o: $(SRC)/%.s | $(OBJ)
 	$(AS) -o $@ $< -I$(INCLUDE) $(ASFLAGS)
 
 $(OBJS): $(OBJ)
