@@ -1,45 +1,54 @@
 PROGRAM		= hello_asm
+ROOT_DIR	= .
 
-ASM		= nasm
-ASMFLAGS	= -Ox -f elf64 -w+all -w-reloc-rel-dword
+AS		= nasm
+ASFLAGS		= -Ox -f elf64 -w+all -w-reloc-rel-dword
 CC		= gcc
 CFLAGS		= -O2 -march=native -Wall -Wextra
-INCLUDE		= include
+INCLUDE		= $(ROOT_DIR)/include
 LD		= ld
-LDFLAGS		=
+LDFLAGS		= -L$(BUILD)
 LDLIBS		= -lm
 
-RM		= rm -f
+RM		= rm -fv
 MKDIR		= mkdir -p
-RMDIR		= rm -rf
+RMDIR		= rm -rfv
 
-SRC		= src
-BUILD		= build
+SRC		= $(ROOT_DIR)/src
+BUILD		= $(ROOT_DIR)/build
 OBJ		= $(BUILD)/obj
-
+BIN		= $(BUILD)/bin
+LIB		= $(BUILD)/lib
 
 OBJS		= main.o hello.o
+OBJS		:= $(addprefix $(OBJ)/,$(OBJS))
 
-.PHONY: all clean debug
-all: $(BUILD)/$(PROGRAM)
+
+.PHONY: all clean debug test
+all: $(BIN)/$(PROGRAM)
 
 debug: CFLAGS	+= -g -Og -DDEBUG
 debug: ASMFLAGS	+= -g -Fdwarf -DDEBUG
 debug: all
 
-$(BUILD)/$(PROGRAM): $(addprefix $(OBJ)/,$(OBJS))
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(BIN)/$(PROGRAM): $(OBJS) | $(BIN)
+	$(CC) -o $@ $^ $(LDLIBS) $(LDFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.c $(DEPS) | $(OBJ)
-	$(CC) $(CFLAGS) -o $@ -c $< -I$(INCLUDE)
+	$(CC) -o $@ -c $< -I$(INCLUDE) $(CFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.asm | $(OBJ)
-	$(ASM) $(ASMFLAGS) -o $@ $< -I$(INCLUDE)
+	$(AS) -o $@ $< -I$(INCLUDE) $(ASFLAGS)
 
-$(OBJ):
+$(OBJS): $(OBJ)
+
+$(BIN) $(LIB) $(OBJ):
 	$(MKDIR) $@
 	
 clean:
 	$(RM) $(OBJ)/*.o
 	$(RMDIR) $(OBJ)
+
+dist-clean: clean
+	$(RMDIR) $(BUILD)
 
