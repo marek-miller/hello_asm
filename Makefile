@@ -1,47 +1,31 @@
-PROGRAM		= hello_asm
-
-INC		=
-SRC		= src
-OBJ		= $(SRC)
-
-HEADERS		= hello.h
-SRCS		= main.c hello.s hello.c
-OBJS		= $(SRCS:%=$(OBJ)/%.o)
-
 AS		= nasm
 ASFLAGS		= -Ox -felf64 -w+all -w-reloc-rel-dword
 CC		= gcc
 CFLAGS		= -O2 -march=native -Wall -Wextra
-INCLUDE		=
+INCLUDE		= include
 LD		= ld
 LDFLAGS		=
 LDLIBS		= -lm
-
+MAKEFLAGS	= #-j6
 RM		= rm -fv
 MKDIR		= mkdir -p
 RMDIR		= rm -rfv
 
+export
 
-.PHONY: all clean debug
+.PHONY: all clean debug test
 .DEFAULT_GOAL	:= all
 
 debug: CFLAGS	+= -DDEBUG -g -Og
 debug: ASFLAGS	+= -DDEBUG -g -Fdwarf
 debug: all
 
-all: $(PROGRAM)
+all:
+	cd src && $(MAKE) $(MAKEFLAGS)
 
-$(PROGRAM): $(OBJS)
-	$(CC) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)
-
-$(OBJ)/%.c.o: $(SRC)/%.c
-	$(CC) -o $@ -c $< -I$(INC) $(CFLAGS)
-
-$(OBJ)/%.s.o: $(SRC)/%.s
-	$(AS) -o $@ $< -I$(INC) $(ASFLAGS)
+test:	all
+	cd test && $(MAKE) $(MAKEFLAGS)
 
 clean:
-	$(RM) $(OBJ)/*.o
-
-dist-clean: clean
-	$(RM) $(PROGRAM)
+	cd src && $(MAKE) clean
+	cd test && $(MAKE) clean
