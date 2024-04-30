@@ -1,4 +1,5 @@
 PROGRAM		= hello_asm
+ROOT_DIR	= ..
 
 SRCS		= main.c hello.s hello.c
 OBJS		= $(SRCS:%=%.o)
@@ -14,10 +15,10 @@ $(PROGRAM): $(OBJS)
 	$(CC) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)
 
 %.c.o: %.c
-	$(CC) -o $@ -c $< -I$(INCLUDE) $(CFLAGS)
+	$(CC) -o $@ -c $< $(CFLAGS)
 
 %.s.o: %.s
-	$(AS) -o $@ $< -I$(INCLUDE) $(ASFLAGS)
+	$(AS) -o $@ $< $(ASFLAGS)
 
 clean:
 	$(RM) *.o *.d
