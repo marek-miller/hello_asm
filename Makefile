@@ -1,65 +1,47 @@
-PROGRAM		= helloasm
-ROOT_DIR	= .
+PROGRAM		= hello_asm
+
+INC		=
+SRC		= src
+OBJ		= $(SRC)
+
+HEADERS		= hello.h
+SRCS		= main.c hello.s hello.c
+OBJS		= $(SRCS:%=$(OBJ)/%.o)
 
 AS		= nasm
 ASFLAGS		= -Ox -felf64 -w+all -w-reloc-rel-dword
 CC		= gcc
 CFLAGS		= -O2 -march=native -Wall -Wextra
-INCLUDE		= $(ROOT_DIR)/include
+INCLUDE		=
 LD		= ld
-LDFLAGS		= -L$(LIB)
+LDFLAGS		=
 LDLIBS		= -lm
 
 RM		= rm -fv
 MKDIR		= mkdir -p
 RMDIR		= rm -rfv
 
-SRC		= $(ROOT_DIR)/src
-BUILD		= $(ROOT_DIR)/build
-BIN		= $(BUILD)/bin
-LIB		= $(BUILD)/lib
-OBJ		= $(BUILD)/obj
-
-HEADERS		= hello.h
-
-SRCS		= main.c
-OBJS		= $(SRCS:%=$(OBJ)/%.o)
-
-LIBNAME		= lib$(PROGRAM).so
-LIBSRCS		= hello.s hello.c
-LIBOBJS		= $(LIBSRCS:%=$(OBJ)/%.o)
-
 
 .PHONY: all clean debug
 .DEFAULT_GOAL	:= all
 
-debug: CFLAGS	+= -DDEBUG -g -Og 
-debug: ASFLAGS	+= -DDEBUG -g -Fdwarf 
+debug: CFLAGS	+= -DDEBUG -g -Og
+debug: ASFLAGS	+= -DDEBUG -g -Fdwarf
 debug: all
 
-all: $(BIN)/$(PROGRAM) $(LIB)/$(LIBNAME)
+all: $(PROGRAM)
 
-$(BIN)/$(PROGRAM): $(OBJS) $(LIB)/$(LIBNAME) | $(BIN) 
-	$(CC) -o $@ $(OBJS) -l$(PROGRAM) $(LDLIBS) $(LDFLAGS)
+$(PROGRAM): $(OBJS)
+	$(CC) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)
 
-$(LIB)/$(LIBNAME): $(LIBOBJS) | $(LIB)
-	$(LD) -shared -o $@ $(LIBOBJS) $(LDLIBS) $(LDFLAGS)
+$(OBJ)/%.c.o: $(SRC)/%.c
+	$(CC) -o $@ -c $< -I$(INC) $(CFLAGS)
 
-$(OBJ)/%.c.o: $(SRC)/%.c | $(INCLUDE)/$(HEADERS) $(OBJ)
-	$(CC) -o $@ -c $< -I$(INCLUDE) -I$(SRC) $(CFLAGS)
+$(OBJ)/%.s.o: $(SRC)/%.s
+	$(AS) -o $@ $< -I$(INC) $(ASFLAGS)
 
-$(OBJ)/%.s.o: $(SRC)/%.s | $(OBJ)
-	$(AS) -o $@ $< -I$(INCLUDE) -I$(SRC) $(ASFLAGS)
-
-$(OBJS) $(LIBOBJS): $(OBJ)
-
-$(BIN) $(LIB) $(OBJ):
-	$(MKDIR) $@
-	
 clean:
 	$(RM) $(OBJ)/*.o
-	$(RMDIR) $(OBJ)
 
 dist-clean: clean
-	$(RMDIR) $(BUILD)
-
+	$(RM) $(PROGRAM)

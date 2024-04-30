@@ -1,5 +1,11 @@
+hello_asm
+
+*.o
+*.d
+*.so
+
+bin/
 build/
 tmp/
 
 .idea/
-
