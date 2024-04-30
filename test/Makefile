@@ -3,7 +3,7 @@ ROOT_DIR	= ..
 
 CFLAGS		+= -I$(ROOT_DIR)/$(SRC)
 
-SRCS		= $(PROGRAM).c
+SRCS		= hello_test.c
 OBJS		= $(SRCS:%=%.o)
 
 TEST_OBJS	= $(addprefix $(ROOT_DIR)/$(SRC)/, hello.c.o hello.s.o)

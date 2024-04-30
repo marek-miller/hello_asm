@@ -5,7 +5,7 @@ CFLAGS		= -O2 -march=native -Wall -Wextra
 LD		= ld
 LDFLAGS		=
 LDLIBS		= -lm
-MAKEFLAGS	= #-j6
+MAKEFLAGS	=
 RM		= rm -fv
 MKDIR		= mkdir -p
 RMDIR		= rm -rfv
