@@ -1,11 +1,14 @@
 PROGRAM		= hello_asm
-ROOT_DIR	= ..
 
 SRCS		= main.c hello.s hello.c
 OBJS		= $(SRCS:%=%.o)
+DEPS		= $(SRCS:%=%.d)
+
 
 .PHONY: all build clean
 .DEFAULT_GOAL	:= all
+
+-include $(DEPS)
 
 all: build
 
@@ -15,7 +18,7 @@ $(PROGRAM): $(OBJS)
 	$(CC) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)
 
 %.c.o: %.c
-	$(CC) -o $@ -c $< $(CFLAGS)
+	$(CC) -MMD -MP $(CFLAGS) -o $@ -c $< 
 
 %.s.o: %.s
 	$(AS) -o $@ $< $(ASFLAGS)
