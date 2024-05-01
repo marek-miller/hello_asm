@@ -1,37 +1,39 @@
+ROOT_DIR	= .
+INC		= $(ROOT_DIR)/include
+
 AS		= nasm
 ASFLAGS		= -Ox -felf64 -w+all -w-reloc-rel-dword
 CC		= gcc
-CFLAGS		= -O2 -march=native -Wall -Wextra
+CFLAGS		= -O2 -march=native -Wall -Wextra -I$(INC)
 LD		= ld
 LDFLAGS		=
 LDLIBS		= -lm
-MAKEFLAGS	=
 RM		= rm -fv
 MKDIR		= mkdir -p
 RMDIR		= rm -rfv
 
-ROOT_DIR	= .
-SRC		= $(ROOT_DIR)/src
-TEST		= $(ROOT_DIR)/test
+SRC		= hello
 
 export
 
-.PHONY: all build build-debug clean test
+.PHONY: all build build-debug build-test clean test
 .DEFAULT_GOAL	:= all
 
 build-debug: CFLAGS	+= -DDEBUG -g -Og
 build-debug: ASFLAGS	+= -DDEBUG -g -Fdwarf
-build-debug: build
+build-debug: build build-test
 
-all: build
+all: build build-test
 
 build:
-	$(MAKE) $(MAKEFLAGS) -C $(SRC)  build
-	$(MAKE) $(MAKEFLAGS) -C $(TEST) build
+	$(MAKE) -C $(SRC) build
 
-test: build
-	$(MAKE) $(MAKEFLAGS) -C $(TEST) test
+build-test:
+	$(MAKE) -C $(SRC) build-test
+
+test:
+	$(MAKE) -C $(SRC) test
 
 clean:
-	$(MAKE) $(MAKEFLAGS) -C $(SRC)  clean
-	$(MAKE) $(MAKEFLAGS) -C $(TEST) clean
+	$(MAKE) -C $(SRC) clean
+
